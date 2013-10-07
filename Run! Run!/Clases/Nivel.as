@@ -29,9 +29,9 @@
 			
 			manzanas= new Array();
 			balas = new Array();
-			addEventListener( Event.ADDED_TO_STAGE, Tutorial);
+			//addEventListener( Event.ADDED_TO_STAGE, Tutorial);
 			
-			reloj= new Timer(5);
+			reloj= new Timer(50);
 			reloj.addEventListener(TimerEvent.TIMER, mover);
 			reloj.start();
 			
@@ -63,8 +63,8 @@
 			}
 			if(Math.random() < 0.03 )
 			{
-				var ran1: Number = Math.random()* 200;
-				var nB: Bala = new Bala(-15,ran1);
+				var ran1: Number = Math.random()* 500;
+				var nB: Bala = new Bala(-15,0);
 				balas.push(nB);
 				
 				addChild(nB);
@@ -85,14 +85,14 @@
 			}	
 			for each ( var B: Bala in balas)
 			{
-				B.movimiento();
+				balas[0].movimiento(reloj);
 				if (cerdito.hitTestObject(B)) 
 				{
-					reloj.stop();
-					dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+					//reloj.stop();
+					//dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
 					//removeChild(cerdito);
 					fin= new GameOver();
-					addChild(fin);
+					//addChild(fin);
 				}
 			}	
 		}
@@ -107,7 +107,7 @@
 			
 		}
 		
-		private function a( var e: Number): void{
+		private function a( e : KeyboardEvent): void{
 			if(e.keyCode == Keyboard.RIGHT){
 				reloj.start();
 			}
