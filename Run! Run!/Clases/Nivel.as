@@ -29,7 +29,7 @@
 			
 			manzanas= new Array();
 			balas = new Array();
-			//addEventListener( Event.ADDED_TO_STAGE, Tutorial);
+			addEventListener( Event.ADDED_TO_STAGE, moverse);
 			
 			reloj= new Timer(50);
 			reloj.addEventListener(TimerEvent.TIMER, mover);
@@ -52,40 +52,61 @@
 		}
 		private function mover(timer:TimerEvent){
 			
-			if(Math.random() < 0.09 )
+			
+			
+			if(Math.random() < 0.11 && manzanas.length<2)
 			{
-				var ran: Number = Math.random()* 200;
+				var ran: Number = (Math.random()* 150)+10;
 				var nM: Manzana = new Manzana(-15,ran);
 				manzanas.push(nM);
 				
 				addChild(nM);
+				if(nM.x>805 || nM.y>605){
+					removeChild(nM);
+					//delete manzanas[M];
+				}
 				
 			}
 			if(Math.random() < 0.03 )
 			{
-				var ran1: Number = Math.random()* 500;
-				var nB: Bala = new Bala(-15,0);
+				var ran1: Number =  Math.random()*150; 
+				var nB: Bala = new Bala(-15,ran1);
 				balas.push(nB);
 				
 				addChild(nB);
 				
 			}
 			
-			for each ( var M: Manzana in manzanas)
-			{
+			
+			var indiceManzanas : int= manzanas.length-1;
+			var indiceBalas : int=balas.length-1;
+			
+			
+			while(indiceManzanas>-1){
+				var M: Manzana = manzanas[indiceManzanas];
 				M.movimiento();
-				if (cerdito.hitTestObject(M)) 
-				{
+				
+				if (cerdito.hitTestObject(M)){
+					trace("captura");
+					M.atrapada(cerdito.puntaCola.x, cerdito.puntaCola.y);
 					//reloj.stop();
 					//dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
 					//removeChild(cerdito);
 					//fin= new GameOver();
 					//addChild(fin);
+					removeChild(M);
+					manzanas.splice(indiceManzanas,1);
 				}
-			}	
+				if(M.x>825 || M.y > 625){
+					removeChild(M);
+					manzanas.splice(indiceManzanas,1);
+				}
+				indiceManzanas=indiceManzanas-1;
+			}
+			
 			for each ( var B: Bala in balas)
 			{
-				balas[0].movimiento(reloj);
+				B.movimiento();
 				if (cerdito.hitTestObject(B)) 
 				{
 					//reloj.stop();
