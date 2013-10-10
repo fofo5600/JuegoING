@@ -28,9 +28,12 @@
 				  this.play();
 			  }
 			  if(evento.keyCode == Keyboard.LEFT){
+				  this.gotoAndStop(9);
 				  mover(-10);
+				  
 			  }
 			  else if(evento.keyCode == Keyboard.RIGHT){
+				  this.gotoAndStop(10);
 				  mover(10);
 			  }
 			  
@@ -53,8 +56,7 @@
 		public function detenerc(evento : KeyboardEvent = null) : void
 		{
 			this.gotoAndStop(1);
-			this.cuerpo.gotoAndStop(1);
-			//this.cara.gotoAndStop(1);
+			this.gotoAndStop(1);
 		}
 
 	}

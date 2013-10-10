@@ -19,8 +19,11 @@
 		private var fin: GameOver;
 		private var bala : Bala;
 		private var balas: Array;
+		private var vidas : int;
 		
 		public function Nivel() {
+			
+			vidas=3;
 			
 			cerdito= new Cerdito();
 			cerdito.x=400;
@@ -53,6 +56,8 @@
 		private function mover(timer:TimerEvent){
 			
 			
+			tiempo.Actualizar();
+			
 			
 			if(Math.random() < 0.11 && manzanas.length<2)
 			{
@@ -67,7 +72,7 @@
 				}
 				
 			}
-			if(Math.random() < 0.03 )
+			/*if(Math.random() < 0.03 )
 			{
 				var ran1: Number =  Math.random()*150; 
 				var nB: Bala = new Bala(-15,ran1);
@@ -75,7 +80,7 @@
 				
 				addChild(nB);
 				
-			}
+			}*/
 			
 			
 			var indiceManzanas : int= manzanas.length-1;
@@ -88,34 +93,33 @@
 				
 				if (cerdito.hitTestObject(M)){
 					trace("captura");
-					M.atrapada(cerdito.puntaCola.x, cerdito.puntaCola.y);
-					//reloj.stop();
-					//dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
-					//removeChild(cerdito);
-					//fin= new GameOver();
-					//addChild(fin);
+					puntaje.Aumentar(10);
 					removeChild(M);
 					manzanas.splice(indiceManzanas,1);
 				}
 				if(M.x>825 || M.y > 625){
 					removeChild(M);
 					manzanas.splice(indiceManzanas,1);
+					puntaje.reducir(2);
 				}
 				indiceManzanas=indiceManzanas-1;
 			}
 			
-			for each ( var B: Bala in balas)
+			/*for each ( var B: Bala in balas)
 			{
 				B.movimiento();
 				if (cerdito.hitTestObject(B)) 
 				{
-					//reloj.stop();
-					//dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
-					//removeChild(cerdito);
-					fin= new GameOver();
-					//addChild(fin);
+					vidas-=1;
+					if(vidas<=0){
+						reloj.stop();
+						dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+						removeChild(cerdito);
+						fin= new GameOver();
+						addChild(fin);
+					}
 				}
-			}	
+			}*/	
 		}
 		
 		private function Tutorial():void

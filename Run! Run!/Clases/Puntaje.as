@@ -1,19 +1,21 @@
 ﻿package  {
 	import flash.text.TextField;
 	
-	public class Puntaje extends Coun{
+	public class Puntaje extends Contador{
 	
-		public var puntaje:TextField;
+		public var score:TextField;
 		
 		public function Puntaje() {
 			// constructor code
 			super();
+			score.text="0";
 		}
 		
-		override public function actualizar():void
+		override public function Actualizar():void
 		{
-			super.actualizar();
-			puntaje.text =  currentValue.toString();
+			super.Actualizar();
+			score.text = numeroActual.toString();
+			trace(score.text+ " "+ numeroActual);
 		}
 
 	}
