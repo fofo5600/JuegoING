@@ -2,9 +2,10 @@
 	import flash.display.SimpleButton;
 	
 	public class Boton extends SimpleButton {
-
-		public function Boton() {
+		
+		public function Boton( ) {
 			// constructor code
+			
 		}
 
 	}

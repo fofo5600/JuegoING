@@ -1,6 +1,14 @@
 ﻿package  {
+	import flash.display.MovieClip;
+	import flash.events.MouseEvent;
+	import flash.display.SimpleButton;
+	import flash.events.KeyboardEvent;
+	import flash.events.Event;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
+	import flash.ui.Keyboard;
 	
-	public class Nivel2 {
+	public class Nivel2 extends MovieClip {
 
 
 		private var cerdito: Cerdito;

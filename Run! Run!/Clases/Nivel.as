@@ -20,10 +20,27 @@
 		private var bala : Bala;
 		private var balas: Array;
 		private var vidas : int;
+		private var vida1: Vida;
+		private var vida2: Vida;
+		private var vida3: Vida;
 		
 		public function Nivel() {
 			
 			vidas=3;
+			vida1= new Vida();
+			vida2= new Vida();
+			vida3= new Vida();
+			
+			vida1.x= 680;
+			vida1.y= 15;
+			vida2.x= 720;
+			vida2.y= 15;
+			vida3.x= 760;
+			vida3.y= 15;
+			
+			addChild(vida1);
+			addChild(vida2);
+			addChild(vida3);
 			
 			cerdito= new Cerdito();
 			cerdito.x=400;
@@ -31,7 +48,7 @@
 			addChild(cerdito);
 			
 			manzanas= new Array();
-			balas = new Array();
+			//balas = new Array();
 			addEventListener( Event.ADDED_TO_STAGE, moverse);
 			
 			reloj= new Timer(50);
@@ -56,8 +73,14 @@
 		private function mover(timer:TimerEvent){
 			
 			
-			tiempo.Actualizar();
-			
+			if(tiempo.segundo==60){
+				trace("ee");
+				terminarJuego();
+			}else{
+				trace(tiempo.segundo);
+				tiempo.Actualizar();
+			}
+						
 			
 			if(Math.random() < 0.11 && manzanas.length<2)
 			{
@@ -84,7 +107,7 @@
 			
 			
 			var indiceManzanas : int= manzanas.length-1;
-			var indiceBalas : int=balas.length-1;
+			//var indiceBalas : int=balas.length-1;
 			
 			
 			while(indiceManzanas>-1){
@@ -113,7 +136,7 @@
 					vidas-=1;
 					if(vidas<=0){
 						reloj.stop();
-						dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+						
 						removeChild(cerdito);
 						fin= new GameOver();
 						addChild(fin);
@@ -137,6 +160,14 @@
 				reloj.start();
 			}
 			
+		}
+		
+		private function terminarJuego(){
+			if(int(puntaje.score.text)>100){
+				trace("entro");
+			}else{
+				dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+			}
 		}
 	}
 	
