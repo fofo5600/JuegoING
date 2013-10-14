@@ -159,7 +159,6 @@
 			if(e.keyCode == Keyboard.RIGHT){
 				reloj.start();
 			}
-			
 		}
 		
 		private function terminarJuego(){
