@@ -18,13 +18,13 @@
 		private var reto:MenuReto;
 		private var login:Login;
 		private var registro:Registrarse;
-		private static var _client:Client
+		private var error : MensajeUsuario;
+		private static var client:Client
 		private static var _playerobject:DatabaseObject
 		private static var _username:String
 		
 		public function Control()
 		{
-			// constructor code
 			
 			login=new Login();
 			addChild(login);
@@ -36,15 +36,11 @@
 			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
 			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
 
-			//addChild(menuprincipal);
-
-			//registrar();
 		}
 
 		public function SeleccionNivel1(evento : EventoBoton):void
 		{
 
-			//trace(evento.currentTarget.)
 			reto = new MenuReto();
 			reto.addEventListener(EventoBoton.NIVEL1, cargarNivel);
 			addChild(reto);
@@ -80,49 +76,35 @@
 		public function inicioSesion(evento : EventoBoton):void
 		{
 
-			//trace(evento.currentTarget.)
-			//login.NombreUs.visible=false;
 			trace(login.NombreUs.text);
 			trace(login.Contrasena.text);
-			_client.bigDB.load("PlayerObjects", "d" ,function(user:DatabaseObject):void{
-				trace("inicia")
-			})  
+			
+			if(login.NombreUs.text != ""){
+				PlayerIO.quickConnect.simpleConnect(
+					stage, 					
+					"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q",
+					login.NombreUs.text,				
+					login.Contrasena.text,						
+					function (){
+						addChild(menuprincipal);
+						removeChild(login);
+					},			
+					handleError				
+					
+				);
+			}
+			
+			
 
 
 		}
 		
 		public function registrar(evento : EventoBoton):void{
 			
-			
-			
 			registro = new Registrarse();
 			registro.addEventListener(EventoBoton.REGISTRO,registrarUsuario);
 			removeChild(login);
 			addChild(registro);
-			
-			//_client.bigDB.createObject();
-			
-			//base.startGame();
-			//e.preventDefault()
-			//e.stopImmediatePropagation()
-			//_client.bigDB.loadRange("PlayerObjects", "Nombre", [], null, null, 10, handleGetToplist)
-		//}		
-		var username:String= "a";
-			_username = username.replace(/[^A-Z0-9]+/gi,"");
-			if(_username != ""){
-				//loginbtn.visible = false;
-				PlayerIO.connect(
-					stage, 					//Referance to stage
-					"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q",//Game id (Get your own at playerio.com. 1: Create user, 2:Goto admin pannel, 3:Create game, 4: Copy game id inside the "")
-					"public",//Config.connectionId,	//Connection id, default is public
-					"a",				//Username
-					"",						//User auth. Can be left blank if authentication is disabled on connection
-					null,					//Current PartnerPay partner.
-					handleSuccess,			//Function executed on successful connect
-					handleError				//Function executed if we recive an error
-					
-				);
-			}
 			
 		}
 		
@@ -132,8 +114,28 @@
 			var contrasena : String= registro.BRContrasena.text;
 			var confirmarContrasena : String= registro.BRConfirmar.text;
 			var encontro : Boolean = false;
-			if(contrasena == confirmarContrasena){
 			
+			if(contrasena == confirmarContrasena){
+				
+				PlayerIO.quickConnect.simpleRegister(
+					stage, 					
+					"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q",
+					usuarioNuevo,				
+					contrasena,	
+					null,null,null,null,null,
+					function(client:Client):void{
+						trace("aqui")
+						client.bigDB.createObject("PlayerObjects", usuarioNuevo, {PuntajeTotal:0, nivel1:0,nivel2:0 },null);
+						registro.BRNombre.text="";
+						registro.BRContrasena.text="";
+						registro.BRConfirmar.text="";
+						removeChild(registro);
+						addChild(login);
+					},			
+					handleError				
+					);
+				
+			/*
 			_client.bigDB.loadRange("PlayerObjects", "Nombre", [], null, null, 10, function handleGetToplist(list:Array):void{
 					
 					list.sortOn( ["ct"], Array.NUMERIC | Array.DESCENDING);
@@ -142,8 +144,12 @@
 						var co:DatabaseObject = list[a] as DatabaseObject
 						trace(co.ct+ " "+ co.key);
 						if(co.key== usuarioNuevo){
+							error = new MensajeUsuario();
+							error.addEventListener(EventoBoton.ERROR, regresar);
+							addChild(error);
 							trace("Usuario igual");
 							encontro=true;
+							
 						}
 					}
 					if(!encontro){
@@ -159,28 +165,31 @@
 					}
 					
 				})
-			
+			*/
 			}else{
-				trace("contrasena igual")
+				trace("contrasena diferente")
 			}
 			
 		}
 		
 		private function handleSuccess(client:Client):void{
-			trace( "error-...........................................")
-			_client = client
-			trace( "error-...........................................")
+			
+			client = client
+			client.bigDB.load("PlayerObjects", "k" ,function(user:DatabaseObject):void{
+				trace("inicia"+ user.key)
+				
+			}, handleError );
 			client.bigDB.loadMyPlayerObject(function(o:DatabaseObject):void{
 				_playerobject = o;
-				trace(_playerobject.toString());
-				//callback();
 			})
 		}
-		
+		private function regresar(evento : EventoBoton):void{
+			removeChild(error); 
+		}
 		
 		private function handleError(e:PlayerIOError):void{
-			//loginbtn.visible = true;
-			trace( "error-...........................................")
+			trace( "error-.............................acaaaaaaaaaaaaaaaaaa..............")
+			trace("no se encontrooo o o o o o o o o o o o o o o o o o s")
 		}
 		private function handleGetToplist(list:Array):void{
 			list.sortOn( ["ct"], Array.NUMERIC | Array.DESCENDING);
@@ -188,10 +197,6 @@
 			for( var a:int=0;a<list.length;a++){
 				var co:DatabaseObject = list[a] as DatabaseObject
 			    trace(list[a]+ " "+co.ct);
-				//var r:HighscoreEntry = new HighscoreEntry( a+1, co.key, parseInt(co.ct+1) );
-				//addChild(r)
-				//r.x = 152
-				//r.y = 126 + a * 15
 				
 			}
 		}

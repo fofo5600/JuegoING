@@ -8,6 +8,7 @@
 		public static const INICIAR : String = "iniciarSeccion";
 		public static const REGISTRAR : String = "registrase";
 		public static const REGISTRO : String = "registro";
+		public static const ERROR : String = "error";
 		
 		public function EventoBoton( type:String) {
 			// constructor code

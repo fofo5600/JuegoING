@@ -145,26 +145,12 @@
 			}*/	
 		}
 		
-		private function Tutorial():void
-		{
-			reloj.stop();
-			
-			trace("moverse a la dereche")
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, a);
-			
-			
-		}
-		
-		private function a( e : KeyboardEvent): void{
-			if(e.keyCode == Keyboard.RIGHT){
-				reloj.start();
-			}
-		}
-		
 		private function terminarJuego(){
+			reloj.stop();
 			if(int(puntaje.score.text)>100){
 				trace("entro");
 			}else{
+				trace("pierde")
 				dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
 			}
 		}
