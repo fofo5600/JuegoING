@@ -20,21 +20,19 @@
 		private var registro:Registrarse;
 		private var error : MensajeUsuario;
 		private static var client:Client
-		private static var _playerobject:DatabaseObject
-		private static var _username:String
+		private static var objectoJugador:DatabaseObject
 		
 		public function Control()
 		{
 			
 			login=new Login();
 			addChild(login);
+			error = new MensajeUsuario();
+			error.addEventListener(EventoBoton.ERROR, regresar);
 			
 			login.addEventListener(EventoBoton.INICIAR, inicioSesion);
 			login.addEventListener(EventoBoton.REGISTRO, registrar);
 			
-			menuprincipal = new MenuPrincipal();
-			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
-			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
 
 		}
 
@@ -42,7 +40,7 @@
 		{
 
 			reto = new MenuReto();
-			reto.addEventListener(EventoBoton.NIVEL1, cargarNivel);
+			reto.addEventListener(EventoBoton.JUGAR, cargarNivel);
 			addChild(reto);
 
 		}
@@ -50,25 +48,29 @@
 		{
 
 			reto = new MenuReto();
-			reto.addEventListener(EventoBoton.NIVEL1, cargarNivel2);
+			reto.addEventListener(EventoBoton.JUGAR, cargarNivel2);
 			addChild(reto);
 
 		}
 		public function cargarNivel(evento : EventoBoton):void
 		{
 
-			nivel1 = new Nivel();
+			nivel1 = new Nivel(objectoJugador);
 			nivel1.x = 0;
 			nivel1.y = 0;
+			nivel1.addEventListener(EventosCerdito.MUERTE, perdio);
+			nivel1.addEventListener(EventosCerdito.GANO, gano);
 			addChild(nivel1);
 			removeChild(reto);
 		}
 		public function cargarNivel2(evento : EventoBoton):void
 		{
 
-			nivel2 = new Nivel2();
+			nivel2 = new Nivel2(objectoJugador);
 			nivel2.x = 0;
 			nivel2.y = 0;
+			nivel2.addEventListener(EventosCerdito.MUERTE, perdio2);
+			nivel2.addEventListener(EventosCerdito.GANO, gano2);
 			addChild(nivel2);
 			removeChild(reto);
 		}
@@ -79,23 +81,32 @@
 			trace(login.NombreUs.text);
 			trace(login.Contrasena.text);
 			
-			if(login.NombreUs.text != ""){
+			if(login.NombreUs.text != "")
+			{
 				PlayerIO.quickConnect.simpleConnect(
 					stage, 					
-					"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q",
-					login.NombreUs.text,				
-					login.Contrasena.text,						
+					"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q", login.NombreUs.text,	login.Contrasena.text,					
 					function (){
-						addChild(menuprincipal);
-						removeChild(login);
-					},			
-					handleError				
-					
-				);
+						trace("-------------------------------------")
+						PlayerIO.connect(
+						stage,"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q","public",login.NombreUs.text,"",
+						null,function (cliente:Client){
+									cliente.bigDB.loadMyPlayerObject(function(objecto:DatabaseObject){
+										objectoJugador = objecto; 
+										menuprincipal = new MenuPrincipal(objecto);
+										menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
+										menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
+										addChild(menuprincipal);
+										removeChild(login);
+																	 
+									});
+						});
+					},  function(errorIO : PlayerIOError){
+							error.gotoAndStop(3);
+							addChild(error);
+						}
+					);
 			}
-			
-			
-
 
 		}
 		
@@ -132,73 +143,53 @@
 						removeChild(registro);
 						addChild(login);
 					},			
-					handleError				
+					function(errorIO:PlayerIOError){
+						error.gotoAndStop(2);
+						addChild(error);
+					}
 					);
-				
-			/*
-			_client.bigDB.loadRange("PlayerObjects", "Nombre", [], null, null, 10, function handleGetToplist(list:Array):void{
-					
-					list.sortOn( ["ct"], Array.NUMERIC | Array.DESCENDING);
-					trace(list.length);
-					for( var a:int=0;a<list.length;a++){
-						var co:DatabaseObject = list[a] as DatabaseObject
-						trace(co.ct+ " "+ co.key);
-						if(co.key== usuarioNuevo){
-							error = new MensajeUsuario();
-							error.addEventListener(EventoBoton.ERROR, regresar);
-							addChild(error);
-							trace("Usuario igual");
-							encontro=true;
-							
-						}
-					}
-					if(!encontro){
-						var nuevo:DatabaseObject = new DatabaseObject();
-						nuevo.ct=contrasena;
-						nuevo.save(false,false,null,null);
-						_client.bigDB.createObject("PlayerObjects", usuarioNuevo, nuevo,null);
-						registro.BRNombre.text="";
-						registro.BRContrasena.text="";
-						registro.BRConfirmar.text="";
-						removeChild(registro);
-						addChild(login);
-					}
-					
-				})
-			*/
+			
 			}else{
+				error.gotoAndStop(1);
+				addChild(error);
 				trace("contrasena diferente")
 			}
-			
+	
 		}
 		
-		private function handleSuccess(client:Client):void{
-			
-			client = client
-			client.bigDB.load("PlayerObjects", "k" ,function(user:DatabaseObject):void{
-				trace("inicia"+ user.key)
-				
-			}, handleError );
-			client.bigDB.loadMyPlayerObject(function(o:DatabaseObject):void{
-				_playerobject = o;
-			})
-		}
-		private function regresar(evento : EventoBoton):void{
-			removeChild(error); 
+		private function gano(evento: EventosCerdito){
+			removeChild(nivel1);
+			menuprincipal = new MenuPrincipal(objectoJugador);
+			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
+			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
+			addChild(menuprincipal);
 		}
 		
-		private function handleError(e:PlayerIOError):void{
-			trace( "error-.............................acaaaaaaaaaaaaaaaaaa..............")
-			trace("no se encontrooo o o o o o o o o o o o o o o o o o s")
+		private function perdio(evento: EventosCerdito){
+			removeChild(nivel1);
+			menuprincipal = new MenuPrincipal(objectoJugador);
+			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
+			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
+			addChild(menuprincipal);
 		}
-		private function handleGetToplist(list:Array):void{
-			list.sortOn( ["ct"], Array.NUMERIC | Array.DESCENDING);
-			trace(list.length);
-			for( var a:int=0;a<list.length;a++){
-				var co:DatabaseObject = list[a] as DatabaseObject
-			    trace(list[a]+ " "+co.ct);
-				
-			}
+		private function gano2(evento: EventosCerdito){
+			removeChild(nivel2);
+			menuprincipal = new MenuPrincipal(objectoJugador);
+			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
+			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
+			addChild(menuprincipal);
+		}
+		
+		private function perdio2(evento: EventosCerdito){
+			removeChild(nivel2);		
+			menuprincipal = new MenuPrincipal(objectoJugador);
+			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
+			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
+			addChild(menuprincipal);
+		}
+		
+		private function regresar(evento : EventoBoton){
+			removeChild(error);
 		}
 		
 	}

@@ -6,10 +6,11 @@
 	
 	public class MensajeUsuario extends MovieClip {
 		
-		
 		public function MensajeUsuario() {
 			// constructor code
-			Ok.addEventListener( MouseEvent.CLICK, Regresar);
+			ok1.addEventListener( MouseEvent.CLICK, Regresar);
+			//ok2.addEventListener( MouseEvent.CLICK, Regresar);
+			//ok3.addEventListener( MouseEvent.CLICK, Regresar);
 
 		}
 		

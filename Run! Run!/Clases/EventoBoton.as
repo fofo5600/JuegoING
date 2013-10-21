@@ -9,6 +9,7 @@
 		public static const REGISTRAR : String = "registrase";
 		public static const REGISTRO : String = "registro";
 		public static const ERROR : String = "error";
+		public static const JUGAR : String = "juegarNivel";
 		
 		public function EventoBoton( type:String) {
 			// constructor code

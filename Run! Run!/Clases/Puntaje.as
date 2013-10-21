@@ -15,7 +15,6 @@
 		{
 			super.Actualizar();
 			score.text = numeroActual.toString();
-			trace(score.text+ " "+ numeroActual);
 		}
 
 	}

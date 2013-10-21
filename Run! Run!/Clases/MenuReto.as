@@ -10,11 +10,11 @@
 		
 		public function MenuReto() {
 			// constructor code
-			nivel1.addEventListener( MouseEvent.CLICK, seleccionNivel1);
+			jugar.addEventListener( MouseEvent.CLICK, seleccionJugar);
 		}
 		
-		public function seleccionNivel1( evento : MouseEvent): void{
-			dispatchEvent(new EventoBoton(EventoBoton.NIVEL1));
+		public function seleccionJugar( evento : MouseEvent): void{
+			dispatchEvent(new EventoBoton(EventoBoton.JUGAR));
 		}
 	}
 	

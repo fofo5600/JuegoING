@@ -7,7 +7,6 @@
 		public var numeroActual:Number;
 		
 		public function Contador() {
-			// constructor code
 			reset();
 		}
 		
@@ -26,7 +25,6 @@
 			Actualizar();
 		}
 		public function reset():void{
-			trace("--------");
 			numeroActual=0;
 			Actualizar();
 		}

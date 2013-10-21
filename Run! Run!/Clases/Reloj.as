@@ -13,14 +13,14 @@
 			
 			reset();
 			segundo=0;
-			reloj.text="0:00";
+			reloj.text=" 00";
 			//contador.addEventListener(TimerEvent.TIMER,Actualizar);
 			//contador.start();
 		}
 		override public function Actualizar():void
 		{
 			super.Actualizar();
-			reloj.text = ":"+segundo;
+			reloj.text = String(segundo);
 		}
 	}
 	

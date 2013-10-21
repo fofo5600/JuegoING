@@ -8,6 +8,7 @@
 	import flash.utils.Timer;
 	import flash.events.TimerEvent;
 	import flash.ui.Keyboard;
+	import playerio.DatabaseObject;
 	
 	
 	public class Nivel extends MovieClip {
@@ -23,8 +24,14 @@
 		private var vida1: Vida;
 		private var vida2: Vida;
 		private var vida3: Vida;
+		private var termino : GameOver;
+		private var esperar : Timer
+		private var objetoJugardor : DatabaseObject
 		
-		public function Nivel() {
+		public function Nivel( objeto : DatabaseObject) {
+			
+			objetoJugardor = objeto
+			
 			
 			vidas=3;
 			vida1= new Vida();
@@ -48,7 +55,6 @@
 			addChild(cerdito);
 			
 			manzanas= new Array();
-			//balas = new Array();
 			addEventListener( Event.ADDED_TO_STAGE, moverse);
 			
 			reloj= new Timer(50);
@@ -72,12 +78,11 @@
 		}
 		private function mover(timer:TimerEvent){
 			
+			manzanaPuntaje.gotoAndStop(1);
 			
 			if(tiempo.segundo==60){
-				trace("ee");
 				terminarJuego();
 			}else{
-				trace(tiempo.segundo);
 				tiempo.Actualizar();
 			}
 						
@@ -91,32 +96,21 @@
 				addChild(nM);
 				if(nM.x>805 || nM.y>605){
 					removeChild(nM);
-					//delete manzanas[M];
+					
 				}
 				
 			}
-			/*if(Math.random() < 0.03 )
-			{
-				var ran1: Number =  Math.random()*150; 
-				var nB: Bala = new Bala(-15,ran1);
-				balas.push(nB);
-				
-				addChild(nB);
-				
-			}*/
 			
 			
-			var indiceManzanas : int= manzanas.length-1;
-			//var indiceBalas : int=balas.length-1;
-			
+			var indiceManzanas : int= manzanas.length-1;			
 			
 			while(indiceManzanas>-1){
 				var M: Manzana = manzanas[indiceManzanas];
 				M.movimiento();
 				
 				if (cerdito.hitTestObject(M)){
-					trace("captura");
-					puntaje.Aumentar(10);
+					manzanaPuntaje.gotoAndStop(2);
+					puntaje.Aumentar(5);
 					removeChild(M);
 					manzanas.splice(indiceManzanas,1);
 				}
@@ -127,32 +121,38 @@
 				}
 				indiceManzanas=indiceManzanas-1;
 			}
-			
-			/*for each ( var B: Bala in balas)
-			{
-				B.movimiento();
-				if (cerdito.hitTestObject(B)) 
-				{
-					vidas-=1;
-					if(vidas<=0){
-						reloj.stop();
-						
-						removeChild(cerdito);
-						fin= new GameOver();
-						addChild(fin);
-					}
-				}
-			}*/	
 		}
 		
 		private function terminarJuego(){
 			reloj.stop();
-			if(int(puntaje.score.text)>100){
-				trace("entro");
-			}else{
-				trace("pierde")
-				dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+			for each ( var M: Manzana in manzanas)
+			{
+				removeChild(M);
 			}
+			
+			removeChild(cerdito)
+			
+			if(int(puntaje.score.text) > 100){
+				objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
+				if(objetoJugardor.nivel1 < int(puntaje.score.text) ){
+					objetoJugardor.nivel1 = int(puntaje.score.text) 
+				}
+				objetoJugardor.save(false,false,null,null)
+				dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
+			}else{
+				termino = new GameOver();
+				addChild(termino);
+				esperar = new Timer(3000)
+				esperar.addEventListener(TimerEvent.TIMER, salir)
+				esperar.start()
+				
+				
+			}
+		}
+		private function salir(tiempo : TimerEvent){
+			esperar.stop()
+			removeChild(termino)
+			dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
 		}
 	}
 	

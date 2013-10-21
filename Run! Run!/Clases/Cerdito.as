@@ -43,7 +43,7 @@
 		private function mover( distancia : int): void{
 			
 			 var nP : int = this.x + distancia;
-			 if(nP > -5 && nP < 805)
+			 if(nP > 200 && nP < 805)
 			 {
 				this.x += distancia;
 			 }

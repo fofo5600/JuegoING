@@ -7,6 +7,7 @@
 	import flash.utils.Timer;
 	import flash.events.TimerEvent;
 	import flash.ui.Keyboard;
+	import playerio.DatabaseObject;
 	
 	public class Nivel2 extends MovieClip {
 
@@ -19,10 +20,30 @@
 		private var bala : Bala;
 		private var balas: Array;
 		private var vidas : int;
+		private var vida1: Vida;
+		private var vida2: Vida;
+		private var vida3: Vida;
+		private var termino : GameOver;
+		private var esperar : Timer
+		private var objetoJugardor : DatabaseObject
 		
-		public function Nivel() {
+		public function Nivel2(objeto : DatabaseObject) {
 			
 			vidas=3;
+			vida1= new Vida();
+			vida2= new Vida();
+			vida3= new Vida();
+			
+			vida1.x= 680;
+			vida1.y= 15;
+			vida2.x= 720;
+			vida2.y= 15;
+			vida3.x= 760;
+			vida3.y= 15;
+			
+			addChild(vida1);
+			addChild(vida2);
+			addChild(vida3);
 			
 			cerdito= new Cerdito();
 			cerdito.x=400;
@@ -44,19 +65,22 @@
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyDown);
 			stage.addEventListener(KeyboardEvent.KEY_UP, KeyUp);
       	}
-		private function KeyDown( e: KeyboardEvent) : void
+		private function KeyDown( evento: KeyboardEvent) : void
       	{
-			cerdito.tecla(e);
+			cerdito.tecla(evento);
 		}
-		private function KeyUp( e: KeyboardEvent) : void
+		private function KeyUp( evento: KeyboardEvent) : void
       	{
-			cerdito.detenerc(e);
+			cerdito.detenerc(evento);
 		}
 		private function mover(timer:TimerEvent){
 			
 			
-			tiempo.Actualizar();
-			
+			if(tiempo.segundo==60){
+				terminarJuego();
+			}else{
+				tiempo.Actualizar();
+			}
 			
 			if(Math.random() < 0.11 && manzanas.length<2)
 			{
@@ -67,7 +91,6 @@
 				addChild(nM);
 				if(nM.x>805 || nM.y>605){
 					removeChild(nM);
-					//delete manzanas[M];
 				}
 				
 			}
@@ -91,15 +114,7 @@
 				M.movimiento();
 				
 				if (cerdito.hitTestObject(M)){
-					trace("captura");
-					//M.atrapada(cerdito.puntaCola.x, cerdito.puntaCola.y);
-					puntaje.Aumentar(10);
-					//Puntaje.Aumentar(10);
-					//reloj.stop();
-					//dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
-					//removeChild(cerdito);
-					//fin= new GameOver();
-					//addChild(fin);
+					puntaje.Aumentar(5);
 					removeChild(M);
 					manzanas.splice(indiceManzanas,1);
 				}
@@ -111,37 +126,69 @@
 				indiceManzanas=indiceManzanas-1;
 			}
 			
-			for each ( var B: Bala in balas)
-			{
+			
+			
+			while(indiceBalas>-1){
+				var B: Bala = balas[indiceBalas];
 				B.movimiento();
-				if (cerdito.hitTestObject(B)) 
-				{
-					vidas-=1;
-					if(vidas<=0){
-						reloj.stop();
-						dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
-						removeChild(cerdito);
-						fin= new GameOver();
-						addChild(fin);
+				
+				if (cerdito.hitTestObject(B)){
+					restarVida()
+					if(vidas==0){
+						terminarJuego()
 					}
+					
+					removeChild(B);
+					balas.splice(indiceBalas,1);
 				}
-			}	
-		}
-		
-		private function Tutorial():void
-		{
-			reloj.stop();
-			
-			trace("moverse a la dereche")
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, a);
-			
-			
-		}
-		
-		private function a( e : KeyboardEvent): void{
-			if(e.keyCode == Keyboard.RIGHT){
-				reloj.start();
+				if(B.x>825 || B.y > 625){
+					removeChild(B);
+					balas.splice(balas,1);
+				}
+				indiceBalas=indiceBalas-1;
 			}
+			
+		}
+		
+		private function terminarJuego(){
+			reloj.stop();
+			for each ( var M: Manzana in manzanas)
+			{
+				removeChild(M);
+			}
+			
+			removeChild(cerdito)
+			
+			if(int(puntaje.score.text) > 100 && vidas>0){
+				objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
+				if(objetoJugardor.nivel2 < int(puntaje.score.text) ){
+					objetoJugardor.nivel2 = int(puntaje.score.text) 
+				}
+				objetoJugardor.save(false,false,null,null)
+				dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
+			}else{
+				termino = new GameOver();
+				addChild(termino);
+				esperar = new Timer(3000)
+				esperar.addEventListener(TimerEvent.TIMER, salir)
+				esperar.start()
+				
+			}
+		}
+		private function salir(tiempo : TimerEvent){
+			esperar.stop()
+			removeChild(termino)
+			dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+		}
+		private function restarVida(){
+			if(vidas==3){
+				removeChild(vida3)
+			}else if(vidas==2){
+				removeChild(vida2)
+			}else{
+				removeChild(vida1)
+			}
+			vidas-=1
 			
 		}
 	}
