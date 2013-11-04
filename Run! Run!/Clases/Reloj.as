@@ -3,11 +3,19 @@
 	import flash.utils.Timer;
 	import flash.text.TextField;
 	import flash.events.TimerEvent;
-	
+	/*
+	 * Clase Reloj
+	 * Creado por: Rodolfo Verjel
+	 * 
+	 */
 	public class Reloj extends TiempoReloj{
 		
 		public var reloj:TextField;
-		
+		/*
+		 * Funcion Reloj
+		 * 			Constructor del Reloj se instancia al entrar a un nivel
+		 * 			
+		 */
 		public function Reloj() {
 			// constructor code
 			

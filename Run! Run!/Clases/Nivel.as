@@ -10,149 +10,76 @@
 	import flash.ui.Keyboard;
 	import playerio.DatabaseObject;
 	
-	
+	/*
+	 * Clase Nivel
+	 * Creado por: Rodolfo Verjel
+	 * 
+	 */
 	public class Nivel extends MovieClip {
 		
-	    private var cerdito: Cerdito;
-		private var reloj: Timer;
-		private var manzana: Manzana;
-		private var manzanas: Array;
-		private var fin: GameOver;
-		private var bala : Bala;
-		private var balas: Array;
-		private var vidas : int;
-		private var vida1: Vida;
-		private var vida2: Vida;
-		private var vida3: Vida;
-		private var termino : GameOver;
-		private var esperar : Timer
-		private var objetoJugardor : DatabaseObject
-		
+		/*
+		 * Funcion Nivel 
+		 * 			Constructor del Nivel lo instancia al entrar al primer nivel
+		 * 			
+		 */
 		public function Nivel( objeto : DatabaseObject) {
 			
-			objetoJugardor = objeto
-			
-			
-			vidas=3;
-			vida1= new Vida();
-			vida2= new Vida();
-			vida3= new Vida();
-			
-			vida1.x= 680;
-			vida1.y= 15;
-			vida2.x= 720;
-			vida2.y= 15;
-			vida3.x= 760;
-			vida3.y= 15;
-			
-			addChild(vida1);
-			addChild(vida2);
-			addChild(vida3);
-			
-			cerdito= new Cerdito();
-			cerdito.x=400;
-			cerdito.y=500;
-			addChild(cerdito);
-			
-			manzanas= new Array();
-			addEventListener( Event.ADDED_TO_STAGE, moverse);
-			
-			reloj= new Timer(50);
-			reloj.addEventListener(TimerEvent.TIMER, mover);
-			reloj.start();
 			
 		}
-		
-		private function moverse( e: Event) : void
+		/*
+		 * Funcion moverse 
+		 * 			Crea los listener para leer si se presiona una tecla
+		 * 			
+		 */
+		public function moverse( e: Event) : void
       	{
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyDown);
-			stage.addEventListener(KeyboardEvent.KEY_UP, KeyUp);
+			
       	}
-		private function KeyDown( e: KeyboardEvent) : void
+		/*
+		 * Funcion KeyDown 
+		 * 			Funcion que se llama al recibir que se presiono una tecla
+		 * 			
+		 */
+		public function KeyDown( e: KeyboardEvent) : void
       	{
-			cerdito.tecla(e);
+			
 		}
-		private function KeyUp( e: KeyboardEvent) : void
+		/*
+		 * Funcion KeyUp 
+		 * 			Funcion que se llama al recibir que se solto una tecla
+		 * 			
+		 */
+		public function KeyUp( e: KeyboardEvent) : void
       	{
-			cerdito.detenerc(e);
+			
 		}
-		private function mover(timer:TimerEvent){
+		/*
+		 * Funcion Tick
+		 * 			Se acualiza la posicion del juego cada vez que cambie el timepo
+		 *			Pre condicion: Cambio en el tiempo del reloj
+		 *			Post condicon: Cambia los diferentes objetos del juego que dependen del tiempo
+		 * 			
+		 */
+		public function Tick(timer:TimerEvent){
 			
-			manzanaPuntaje.gotoAndStop(1);
-			
-			if(tiempo.segundo==60){
-				terminarJuego();
-			}else{
-				tiempo.Actualizar();
-			}
-						
-			
-			if(Math.random() < 0.11 && manzanas.length<2)
-			{
-				var ran: Number = (Math.random()* 150)+10;
-				var nM: Manzana = new Manzana(-15,ran);
-				manzanas.push(nM);
-				
-				addChild(nM);
-				if(nM.x>805 || nM.y>605){
-					removeChild(nM);
-					
-				}
-				
-			}
-			
-			
-			var indiceManzanas : int= manzanas.length-1;			
-			
-			while(indiceManzanas>-1){
-				var M: Manzana = manzanas[indiceManzanas];
-				M.movimiento();
-				
-				if (cerdito.hitTestObject(M)){
-					manzanaPuntaje.gotoAndStop(2);
-					puntaje.Aumentar(5);
-					removeChild(M);
-					manzanas.splice(indiceManzanas,1);
-				}
-				if(M.x>825 || M.y > 625){
-					removeChild(M);
-					manzanas.splice(indiceManzanas,1);
-					puntaje.reducir(2);
-				}
-				indiceManzanas=indiceManzanas-1;
-			}
 		}
-		
-		private function terminarJuego(){
-			reloj.stop();
-			for each ( var M: Manzana in manzanas)
-			{
-				removeChild(M);
-			}
-			
-			removeChild(cerdito)
-			
-			if(int(puntaje.score.text) > 100){
-				objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
-				if(objetoJugardor.nivel1 < int(puntaje.score.text) ){
-					objetoJugardor.nivel1 = int(puntaje.score.text) 
-				}
-				objetoJugardor.save(false,false,null,null)
-				dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
-			}else{
-				termino = new GameOver();
-				addChild(termino);
-				esperar = new Timer(3000)
-				esperar.addEventListener(TimerEvent.TIMER, salir)
-				esperar.start()
-				
-				
-			}
+		/*
+		 * Funcion terminarJuego 
+		 * 			Termina la partida al morir o terminar el juego
+		 *			Pre condicion: Termina la partida
+		 *			Post condicion: SE llama el constructor de una de las pantallas
+		 * 			
+		 */
+		public function terminarJuego(){
+	
 		}
-		private function salir(tiempo : TimerEvent){
-			esperar.stop()
-			removeChild(termino)
-			dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+		/*
+		 * Funcion Salir 
+		 * 			Envia un evento de muerte del cerdito para terminar la partida
+		 * 			
+		 */
+		public function salir(tiempo : TimerEvent){
+			
 		}
 	}
 	

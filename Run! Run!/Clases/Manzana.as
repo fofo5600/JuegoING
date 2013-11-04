@@ -1,28 +1,46 @@
 ﻿package  {
 	import flash.display.MovieClip;
-	
-	public class Manzana extends MovieClip {
+	/*
+	 * Clase Manzana
+	 * Creado por: Rodolfo Verjel
+	 * 
+	 */
+	public class Manzana extends Objeto {
 		
 		private var entro : Boolean;
-		private var v:int;
-		
-		public function Manzana( ix: int, iy:int) {
+		private var velocidad:int;
+		/*
+		 * Funcion Manzana 
+		 * 			Constructor de la clase manzana que instancia una manzana en los niveles
+		 * 			
+		 */
+		public function Manzana( inicialx: int, inicialy:int) {
 			// constructor code
 			entro=false;
-			x=ix;
-			v=iy;
+			x=inicialx;
+			velocidad=inicialy;
 		}
-		public function movimiento(): void{
+		/*
+		 * Funcion movimiento
+		 * 			Actualiza la posicion de la manzana dando forma de tiro parabolico
+		 *			Pre condicion: 
+		 * 			Psot condicion: la manzana cabia de posicion en x e y 
+		 */
+		override public function movimiento(): void{
 			if(!entro)
 			{
-				y = 0.0009 * Math.pow(((x += 20) - 350),2) + v;
-			//x= x+3;
+				y = 0.0009 * Math.pow(((x += 10) - 350),2) + velocidad;
 			}
 		
 		}
-		public function atrapada( px : int, py : int):void{
-			x=px;
-			y=py;
+		/*
+		 * Funcion atrapa
+		 * 			Elimina la manzana de la pantalla si esta es atrapada
+		 * 			
+		 */
+		public function atrapada( posicionx : int, posiciony : int):void{
+			x=posicionx;
+			y=posiciony;
 			entro=true;
 		}
 

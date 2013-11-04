@@ -8,8 +8,12 @@
 	import flash.events.TimerEvent;
 	import flash.ui.Keyboard;
 	import playerio.DatabaseObject;
-	
-	public class Nivel2 extends MovieClip {
+	/*
+	 * Clase Nivel2
+	 * Creado por: Rodolfo Verjel
+	 * 
+	 */
+	public class Nivel2 extends Nivel {
 
 
 		private var cerdito: Cerdito;
@@ -26,8 +30,14 @@
 		private var termino : GameOver;
 		private var esperar : Timer
 		private var objetoJugardor : DatabaseObject
-		
+		/*
+		 * Funcion Nivel2 
+		 * 			Constructor del Nivel lo instancia al entrar al segundo nivel
+		 * 			
+		 */
 		public function Nivel2(objeto : DatabaseObject) {
+			
+			super(objeto)
 			
 			vidas=3;
 			vida1= new Vida();
@@ -55,26 +65,48 @@
 			addEventListener( Event.ADDED_TO_STAGE, moverse);
 			
 			reloj= new Timer(50);
-			reloj.addEventListener(TimerEvent.TIMER, mover);
+			reloj.addEventListener(TimerEvent.TIMER, Tick);
 			reloj.start();
 			
 		}
-		
-		private function moverse( e: Event) : void
+		/*
+		 * Funcion moverse 
+		 * 			Crea los listener para leer si se presiona una tecla
+		 * 			
+		 */
+		override public function moverse( e: Event) : void
       	{
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyDown);
 			stage.addEventListener(KeyboardEvent.KEY_UP, KeyUp);
       	}
-		private function KeyDown( evento: KeyboardEvent) : void
+		/*
+		 * Funcion KeyDown 
+		 * 			Funcion que se llama al recibir que se presiono una tecla
+		 * 			
+		 */
+		override public function KeyDown( evento: KeyboardEvent) : void
       	{
 			cerdito.tecla(evento);
 		}
-		private function KeyUp( evento: KeyboardEvent) : void
+		/*
+		 * Funcion KeyUp 
+		 * 			Funcion que se llama al recibir que se solto una tecla
+		 * 			
+		 */
+		override public function KeyUp( evento: KeyboardEvent) : void
       	{
 			cerdito.detenerc(evento);
 		}
-		private function mover(timer:TimerEvent){
+		/*
+		 * Funcion Tick
+		 * 			Se acualiza la posicion del juego cada vez que cambie el timepo
+		 *			Pre condicion: Cambio en el tiempo del reloj
+		 *			Post condicon: Cambia los diferentes objetos del juego que dependen del tiempo
+		 * 			
+		 */
+		override public function Tick(timer:TimerEvent){
 			
+			manzanaPuntaje.gotoAndStop(1);
 			
 			if(tiempo.segundo==60){
 				terminarJuego();
@@ -114,6 +146,7 @@
 				M.movimiento();
 				
 				if (cerdito.hitTestObject(M)){
+					manzanaPuntaje.gotoAndStop(2);
 					puntaje.Aumentar(5);
 					removeChild(M);
 					manzanas.splice(indiceManzanas,1);
@@ -149,8 +182,14 @@
 			}
 			
 		}
-		
-		private function terminarJuego(){
+		/*
+		 * Funcion terminarJuego 
+		 * 			Termina la partida al morir o terminar el juego
+		 *			Pre condicion: Termina la partida
+		 *			Post condicion: SE llama el constructor de una de las pantallas
+		 * 			
+		 */
+		override public function terminarJuego(){
 			reloj.stop();
 			for each ( var M: Manzana in manzanas)
 			{
@@ -175,11 +214,22 @@
 				
 			}
 		}
-		private function salir(tiempo : TimerEvent){
+		/*
+		 * Funcion Salir 
+		 * 			Envia un evento de muerte del cerdito para terminar la partida
+		 * 			
+		 */
+		override public function salir(tiempo : TimerEvent){
 			esperar.stop()
 			removeChild(termino)
 			dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
 		}
+		/*
+		 * Funcion Salir 
+		 * 			Envia un evento de muerte del cerdito para terminar la partida
+		 * 			Pre condicion: El cerdito toca algun objeto maligno
+		 *			Post condicion: La variable vida se reduce 
+		 */
 		private function restarVida(){
 			if(vidas==3){
 				removeChild(vida3)

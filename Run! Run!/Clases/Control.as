@@ -8,23 +8,29 @@
 	import playerio.Client;
 	import playerio.PlayerIOError;
 	import playerio.DatabaseObject;
-
-	public class Control extends State
+	/*
+	 * Clase Control
+	 * Creado por: Rodolfo Verjel
+	 *
+	 */
+	public class Control extends MovieClip
 	{
 
 		private var menuprincipal:MenuPrincipal;
 		private var nivel1:Nivel;
 		private var nivel2:Nivel2;
-		private var reto:MenuReto;
+		private var reto:MenuCarga;
 		private var login:Login;
 		private var registro:Registrarse;
 		private var error : MensajeUsuario;
-		private static var client:Client
+		public static var cliente:Client
 		private static var objectoJugador:DatabaseObject
+		private var puntuacion:TablaPuntaje
+		private var pantallaReto:PantallaRetos
 		
 		public function Control()
 		{
-			
+		
 			login=new Login();
 			addChild(login);
 			error = new MensajeUsuario();
@@ -38,24 +44,33 @@
 
 		public function SeleccionNivel1(evento : EventoBoton):void
 		{
-
-			reto = new MenuReto();
+			reto = new MenuCarga(objectoJugador);
 			reto.addEventListener(EventoBoton.JUGAR, cargarNivel);
+			reto.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton)
+									 {
+										 removeChild(reto)
+										// inicioSesion(evento)
+									 });
 			addChild(reto);
 
 		}
 		public function SeleccionNivel2(evento : EventoBoton):void
 		{
 
-			reto = new MenuReto();
+			reto = new MenuCarga(objectoJugador);
 			reto.addEventListener(EventoBoton.JUGAR, cargarNivel2);
+			reto.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton)
+									 {
+										 removeChild(reto)
+										// inicioSesion(evento)
+									 });
 			addChild(reto);
 
 		}
 		public function cargarNivel(evento : EventoBoton):void
 		{
 
-			nivel1 = new Nivel(objectoJugador);
+			nivel1 = new Nivel1(objectoJugador);
 			nivel1.x = 0;
 			nivel1.y = 0;
 			nivel1.addEventListener(EventosCerdito.MUERTE, perdio);
@@ -74,46 +89,53 @@
 			addChild(nivel2);
 			removeChild(reto);
 		}
-	
+		public function mostrarPuntaje(evento : EventoBoton):void
+		{
+			puntuacion = new TablaPuntaje(objectoJugador)
+			removeChild(menuprincipal)
+			addChild(puntuacion)
+			
+			
+		}
 		public function inicioSesion(evento : EventoBoton):void
 		{
 
-			trace(login.NombreUs.text);
-			trace(login.Contrasena.text);
-			
+	
 			if(login.NombreUs.text != "")
 			{
 				PlayerIO.quickConnect.simpleConnect(
 					stage, 					
 					"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q", login.NombreUs.text,	login.Contrasena.text,					
 					function (){
-						trace("-------------------------------------")
+						//trace("-------------------------------------")
 						PlayerIO.connect(
 						stage,"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q","public",login.NombreUs.text,"",
-						null,function (cliente:Client){
+						null,function (clienteNuevo:Client){
+									cliente= clienteNuevo
 									cliente.bigDB.loadMyPlayerObject(function(objecto:DatabaseObject){
 										objectoJugador = objecto; 
-										menuprincipal = new MenuPrincipal(objecto);
-										menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
-										menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
-										addChild(menuprincipal);
+										cargarMenuPrincipal()
 										removeChild(login);
 																	 
 									});
 						});
 					},  function(errorIO : PlayerIOError){
 							error.gotoAndStop(3);
+							trace(errorIO)
 							addChild(error);
 						}
 					);
 			}
 
 		}
-		
 		public function registrar(evento : EventoBoton):void{
 			
 			registro = new Registrarse();
 			registro.addEventListener(EventoBoton.REGISTRO,registrarUsuario);
+			registro.addEventListener(EventoBoton.VOLVER,function(evento : EventoBoton){
+									  		removeChild(registro)
+											addChild(login)
+									  });
 			removeChild(login);
 			addChild(registro);
 			
@@ -135,8 +157,8 @@
 					contrasena,	
 					null,null,null,null,null,
 					function(client:Client):void{
-						trace("aqui")
-						client.bigDB.createObject("PlayerObjects", usuarioNuevo, {PuntajeTotal:0, nivel1:0,nivel2:0 },null);
+						//trace("aqui")
+						client.bigDB.createObject("PlayerObjects", usuarioNuevo, {PuntajeTotal:0, nivel1:0,nivel2:0, nivelActual:0 },null);
 						registro.BRNombre.text="";
 						registro.BRContrasena.text="";
 						registro.BRConfirmar.text="";
@@ -159,39 +181,43 @@
 		
 		private function gano(evento: EventosCerdito){
 			removeChild(nivel1);
-			menuprincipal = new MenuPrincipal(objectoJugador);
-			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
-			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
-			addChild(menuprincipal);
+			cargarMenuPrincipal()
 		}
 		
 		private function perdio(evento: EventosCerdito){
 			removeChild(nivel1);
-			menuprincipal = new MenuPrincipal(objectoJugador);
-			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
-			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
-			addChild(menuprincipal);
+			cargarMenuPrincipal()
 		}
 		private function gano2(evento: EventosCerdito){
 			removeChild(nivel2);
-			menuprincipal = new MenuPrincipal(objectoJugador);
-			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
-			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
-			addChild(menuprincipal);
+			cargarMenuPrincipal()
 		}
 		
 		private function perdio2(evento: EventosCerdito){
 			removeChild(nivel2);		
-			menuprincipal = new MenuPrincipal(objectoJugador);
-			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
-			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
-			addChild(menuprincipal);
+			cargarMenuPrincipal()
 		}
 		
 		private function regresar(evento : EventoBoton){
 			removeChild(error);
 		}
-		
+		private function pantallaRetos(evento:EventoBoton){
+			pantallaReto= new PantallaRetos()
+			pantallaReto.addEventListener(EventoBoton.JUGAR, cargarNivel);
+			pantallaReto.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton)
+									 {
+										 removeChild(pantallaReto)
+									 });
+			addChild(pantallaReto)
+		}
+		private function cargarMenuPrincipal(){
+			menuprincipal = new MenuPrincipal(objectoJugador);
+			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
+			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
+			menuprincipal.addEventListener(EventoBoton.PUNTAJE, mostrarPuntaje);
+			menuprincipal.addEventListener(EventoBoton.RETOS, pantallaRetos);
+			addChild(menuprincipal);
+		}
 	}
 
 }
