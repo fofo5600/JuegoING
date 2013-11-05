@@ -189,20 +189,17 @@
 				}
 				if(retando){
 					Control.cliente.bigDB.load("PlayerObjects", MenuCarga.usuarioRetado,function(usuario:DatabaseObject){
-											   		usuario.nivelRecibido1=1
-													usuario.retador1=objetoJugardor.key
-													usuario.PuntajeRetador1=int(puntaje.score.text)
+											   		trace(usuario.retos)
+													usuario.retos+=1
 													
 													usuario.save(false,false,null,null)
-													
-													objetoJugardor.nivelEnviado1=1
-													objetoJugardor.retado1=MenuCarga.usuarioRetado
-													objetoJugardor.MiPuntajeEnviado1=int(puntaje.score.text)
-													
-													objetoJugardor.save(false,false,null,null)
-													
+													Control.cliente.bigDB.createObject("RetosRecibidos", MenuCarga.usuarioRetado+usuario.retos , {nivel:1,retador:objetoJugardor.key,puntajeRetador:int(puntaje.score.text), miPuntaje:-1, resultado:false, usuario: MenuCarga.usuarioRetado },null,null)	
 											   })
+										   
+					Control.cliente.bigDB.createObject("RetosEnviados", objetoJugardor.key+objetoJugardor.retos , {nivel:1,retado:MenuCarga.usuarioRetado,miPuntaje:int(puntaje.score.text), puntajeRetado:-1, resultado:false, usuario:objetoJugardor.key },null,null)				
+					
 				}
+				objetoJugardor.retosEnviados+=1
 				objetoJugardor.save(false,false,null,null)
 				dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
 			}else{

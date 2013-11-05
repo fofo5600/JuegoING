@@ -92,7 +92,11 @@
 		public function mostrarPuntaje(evento : EventoBoton):void
 		{
 			puntuacion = new TablaPuntaje(objectoJugador)
-			removeChild(menuprincipal)
+			//removeChild(menuprincipal)
+			puntuacion.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton)
+									 {
+										 removeChild(puntuacion)
+									 });
 			addChild(puntuacion)
 			
 			
@@ -158,7 +162,7 @@
 					null,null,null,null,null,
 					function(client:Client):void{
 						//trace("aqui")
-						client.bigDB.createObject("PlayerObjects", usuarioNuevo, {PuntajeTotal:0, nivel1:0,nivel2:0, nivelActual:0 },null);
+						client.bigDB.createObject("PlayerObjects", usuarioNuevo, {PuntajeTotal:0, nivel1:0,nivel2:0, nivelActual:1, retos:0, retosEnviados:0 },null);
 						registro.BRNombre.text="";
 						registro.BRContrasena.text="";
 						registro.BRConfirmar.text="";
@@ -202,7 +206,7 @@
 			removeChild(error);
 		}
 		private function pantallaRetos(evento:EventoBoton){
-			pantallaReto= new PantallaRetos()
+			pantallaReto= new PantallaRetos(objectoJugador)
 			pantallaReto.addEventListener(EventoBoton.JUGAR, cargarNivel);
 			pantallaReto.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton)
 									 {
