@@ -33,15 +33,17 @@
 		private var esperar : Timer
 		private var objetoJugardor : DatabaseObject
 		private var retando: Boolean
+		private var jugandoReto: Boolean
 		/*
 		 * Funcion Nivel 
 		 * 			Constructor del Nivel lo instancia al entrar al primer nivel
 		 * 			
 		 */
-		public function Nivel1( objeto : DatabaseObject) {
+		public function Nivel1( objeto : DatabaseObject, jugandoReto:Boolean) {
 			
 			super(objeto)
 			
+			this.jugandoReto=jugandoReto
 			objetoJugardor = objeto
 			if(MenuCarga.usuarioRetado!=""){
 				retando=true
@@ -178,37 +180,65 @@
 			
 			removeChild(cerdito)
 			
-			if(int(puntaje.score.text) > 100){
-				objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
-				if(objetoJugardor.nivel1 < int(puntaje.score.text) ){
-					objetoJugardor.nivel1 = int(puntaje.score.text) 
-					
-				}
-				if(objetoJugardor.nivelActual==1){
-					objetoJugardor.nivelActual=2
-				}
-				if(retando){
-					Control.cliente.bigDB.load("PlayerObjects", MenuCarga.usuarioRetado,function(usuario:DatabaseObject){
-											   		trace(usuario.retos)
-													usuario.retos+=1
-													
+			if(jugandoReto){
+				Control.cliente.bigDB.load("RetosEnviados",Control.retador,function(usuario:DatabaseObject){
+													trace("entro aqui i i "+usuario.puntajeRetado)
+													usuario.puntajeRetado=int(puntaje.score.text)
+													objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
+													objetoJugardor.save(false,false,null,null)
+													usuario.puntajeRetado=int(puntaje.score.text)
 													usuario.save(false,false,null,null)
-													Control.cliente.bigDB.createObject("RetosRecibidos", MenuCarga.usuarioRetado+usuario.retos , {nivel:1,retador:objetoJugardor.key,puntajeRetador:int(puntaje.score.text), miPuntaje:-1, resultado:false, usuario: MenuCarga.usuarioRetado },null,null)	
-											   })
-										   
-					Control.cliente.bigDB.createObject("RetosEnviados", objetoJugardor.key+objetoJugardor.retosEnviados , {nivel:1,retado:MenuCarga.usuarioRetado,miPuntaje:int(puntaje.score.text), puntajeRetado:-1, resultado:false, usuario:objetoJugardor.key },null,null)				
+													if(int(puntaje.score.text)>usuario.miPuntaje){
+														objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
+														objetoJugardor.save(false,false,null,null)
+														
+													}else if(int(puntaje.score.text)<usuario.miPuntaje){
+														
+														Control.cliente.bigDB.load("PlayerObjects",usuario.usuario,function(usuarioGanador:DatabaseObject){
+																				   		usuarioGanador.PuntajeTotal+=usuario.miPuntaje
+																						usuarioGanador.save(false,false,null,null)
+																				   })
+														termino = new GameOver();
+														addChild(termino);
+														esperar = new Timer(3000)
+														esperar.addEventListener(TimerEvent.TIMER, salir)
+														esperar.start()
+													}
+												},null)
+			}else{
+				
+				if(int(puntaje.score.text) > 100){
+					objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
+					if(objetoJugardor.nivel1 < int(puntaje.score.text) ){
+						objetoJugardor.nivel1 = int(puntaje.score.text) 
+						
+					}
+					if(objetoJugardor.nivelActual==1){
+						objetoJugardor.nivelActual=2
+					}
+					if(retando){
+						Control.cliente.bigDB.load("PlayerObjects", MenuCarga.usuarioRetado,function(usuario:DatabaseObject){
+														trace(usuario.retos)
+														usuario.retos+=1
+														
+														usuario.save(false,false,null,null)
+														Control.cliente.bigDB.createObject("RetosRecibidos", MenuCarga.usuarioRetado+usuario.retos , {nivel:1,retador:objetoJugardor.key,puntajeRetador:int(puntaje.score.text), miPuntaje:-1, resultado:false, usuario: MenuCarga.usuarioRetado },null,null)	
+												   })
+											   
+						Control.cliente.bigDB.createObject("RetosEnviados", objetoJugardor.key+objetoJugardor.retosEnviados , {nivel:1,retado:MenuCarga.usuarioRetado,miPuntaje:int(puntaje.score.text), puntajeRetado:-1, resultado:false, usuario:objetoJugardor.key },null,null)				
+						
+					}
+					objetoJugardor.retosEnviados+=1
+					objetoJugardor.save(false,false,null,null)
+					dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
+				}else{
+					termino = new GameOver();
+					addChild(termino);
+					esperar = new Timer(3000)
+					esperar.addEventListener(TimerEvent.TIMER, salir)
+					esperar.start()
 					
 				}
-				objetoJugardor.retosEnviados+=1
-				objetoJugardor.save(false,false,null,null)
-				dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
-			}else{
-				termino = new GameOver();
-				addChild(termino);
-				esperar = new Timer(3000)
-				esperar.addEventListener(TimerEvent.TIMER, salir)
-				esperar.start()
-				
 			}
 		}
 		/*

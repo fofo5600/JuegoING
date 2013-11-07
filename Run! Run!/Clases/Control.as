@@ -27,10 +27,12 @@
 		private static var objectoJugador:DatabaseObject
 		private var puntuacion:TablaPuntaje
 		private var pantallaReto:PantallaRetos
+		private var jugandoReto:Boolean
+		public static var retador:String
 		
 		public function Control()
 		{
-		
+			jugandoReto=false
 			login=new Login();
 			addChild(login);
 			error = new MensajeUsuario();
@@ -44,25 +46,24 @@
 
 		public function SeleccionNivel1(evento : EventoBoton):void
 		{
+			jugandoReto=false
 			reto = new MenuCarga(objectoJugador);
 			reto.addEventListener(EventoBoton.JUGAR, cargarNivel);
 			reto.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton)
 									 {
 										 removeChild(reto)
-										// inicioSesion(evento)
 									 });
 			addChild(reto);
 
 		}
 		public function SeleccionNivel2(evento : EventoBoton):void
 		{
-
+			jugandoReto=false
 			reto = new MenuCarga(objectoJugador);
 			reto.addEventListener(EventoBoton.JUGAR, cargarNivel2);
 			reto.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton)
 									 {
 										 removeChild(reto)
-										// inicioSesion(evento)
 									 });
 			addChild(reto);
 
@@ -70,7 +71,7 @@
 		public function cargarNivel(evento : EventoBoton):void
 		{
 
-			nivel1 = new Nivel1(objectoJugador);
+			nivel1 = new Nivel1(objectoJugador, jugandoReto);
 			nivel1.x = 0;
 			nivel1.y = 0;
 			nivel1.addEventListener(EventosCerdito.MUERTE, perdio);
@@ -207,11 +208,19 @@
 		}
 		private function pantallaRetos(evento:EventoBoton){
 			pantallaReto= new PantallaRetos(objectoJugador)
-			pantallaReto.addEventListener(EventoBoton.JUGAR, cargarNivel);
-			pantallaReto.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton)
-									 {
-										 removeChild(pantallaReto)
-									 });
+			pantallaReto.addEventListener(EventoBoton.JUGAR, function(evento:EventoBoton){
+										  		jugandoReto=true
+												retador=pantallaReto.llave
+												if(pantallaReto.nivel==1){
+													cargarNivel(evento)
+												}else if(pantallaReto.nivel==2){
+													cargarNivel2(evento)
+												}
+												removeChild(pantallaReto)
+										  });
+			pantallaReto.addEventListener(EventoBoton.VOLVER, function(evento: EventoBoton){
+										 		removeChild(pantallaReto)
+									 		});
 			addChild(pantallaReto)
 		}
 		private function cargarMenuPrincipal(){
