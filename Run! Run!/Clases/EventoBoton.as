@@ -17,12 +17,17 @@
 		public static const VOLVER : String = "volver";
 		public static const PUNTAJE : String = "puntaje";
 		public static const RETOS : String = "retos";
+		public static const SIG : String = "siguiente";
+		public static const INICIO : String = "iniciar";
+		
 		
 		public function EventoBoton( type:String) {
 			// constructor code
 		
 			super(type);
 		}
+		
+		
 
 	}
 	

@@ -34,6 +34,7 @@
 		private var objetoJugardor : DatabaseObject
 		private var retando: Boolean
 		private var jugandoReto: Boolean
+		private var historia:Historia
 		/*
 		 * Funcion Nivel 
 		 * 			Constructor del Nivel lo instancia al entrar al primer nivel
@@ -50,36 +51,59 @@
 			}else{
 				retando=false
 			}
-			
-			
-			
-			vidas=3;
-			vida1= new Vida();
-			vida2= new Vida();
-			vida3= new Vida();
-			
-			vida1.x= 680;
-			vida1.y= 15;
-			vida2.x= 720;
-			vida2.y= 15;
-			vida3.x= 760;
-			vida3.y= 15;
-			
-			addChild(vida1);
-			addChild(vida2);
-			addChild(vida3);
-			
-			cerdito= new Cerdito();
-			cerdito.x=400;
-			cerdito.y=500;
-			addChild(cerdito);
-			
-			manzanas= new Array();
 			addEventListener( Event.ADDED_TO_STAGE, moverse);
+			manzanaPuntaje.gotoAndStop(1)
+			tiempo.stop()
 			
-			reloj= new Timer(80);
-			reloj.addEventListener(TimerEvent.TIMER, Tick);
-			reloj.start();
+			historia = new Historia()
+			historia.gotoAndStop(1)
+			historia.addEventListener(EventoBoton.SIG,function(evento:EventoBoton){
+									  		historia.nextFrame()
+											trace(historia.currentFrame)
+											if(historia.currentFrame==6){
+												var espera:Timer = new Timer(3000);
+												espera.addEventListener(TimerEvent.TIMER, function(evento:TimerEvent){
+																			historia.gotoAndStop(7)
+																			espera.stop()
+																			
+																		})
+												espera.start();
+											}
+									  })
+			historia.addEventListener(EventoBoton.INICIO,function(evento:EventoBoton){	
+												//historia.removeChildren(0,historia.numChildren)
+												removeChild(historia)
+												
+												vidas=3;
+												vida1= new Vida();
+												vida2= new Vida();
+												vida3= new Vida();
+												
+												vida1.x= 680;
+												vida1.y= 15;
+												vida2.x= 720;
+												vida2.y= 15;
+												vida3.x= 760;
+												vida3.y= 15;
+												
+												addChild(vida1);
+												addChild(vida2);
+												addChild(vida3);
+												
+												cerdito= new Cerdito();
+												cerdito.x=400;
+												cerdito.y=500;
+												addChild(cerdito);
+												
+												manzanas= new Array();												
+												
+												reloj= new Timer(80);
+												reloj.addEventListener(TimerEvent.TIMER, Tick);
+												reloj.start();
+			
+											})
+			
+			addChild(historia)
 			
 		}
 		/*
@@ -89,6 +113,7 @@
 		 */
 		override public function moverse( e: Event) : void
       	{
+			
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, KeyDown);
 			stage.addEventListener(KeyboardEvent.KEY_UP, KeyUp);
       	}
@@ -205,7 +230,8 @@
 														esperar.start()
 													}
 												},null)
-			}else{
+			}
+			if(retando){
 				
 				if(int(puntaje.score.text) > 100){
 					objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
@@ -217,15 +243,14 @@
 						objetoJugardor.nivelActual=2
 					}
 					if(retando){
+						trace("entrooooooooo")
 						Control.cliente.bigDB.load("PlayerObjects", MenuCarga.usuarioRetado,function(usuario:DatabaseObject){
 														trace(usuario.retos)
 														usuario.retos+=1
 														
 														usuario.save(false,false,null,null)
 														Control.cliente.bigDB.createObject("RetosRecibidos", MenuCarga.usuarioRetado+usuario.retos , {nivel:1,retador:objetoJugardor.key,puntajeRetador:int(puntaje.score.text), miPuntaje:-1, resultado:false, usuario: MenuCarga.usuarioRetado },null,null)	
-												   })
-											   
-						Control.cliente.bigDB.createObject("RetosEnviados", objetoJugardor.key+objetoJugardor.retosEnviados , {nivel:1,retado:MenuCarga.usuarioRetado,miPuntaje:int(puntaje.score.text), puntajeRetado:-1, resultado:false, usuario:objetoJugardor.key },null,null)				
+												   })	
 						
 					}
 					objetoJugardor.retosEnviados+=1

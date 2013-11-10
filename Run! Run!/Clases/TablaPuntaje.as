@@ -17,15 +17,16 @@
 		public function TablaPuntaje(usuario:DatabaseObject) {
 			// constructor code
 			this.usuario= usuario
-			trace("entro")
+			
 			Volver.addEventListener( MouseEvent.CLICK, regresar);
 			Control.cliente.bigDB.loadRange("PlayerObjects", "puntajeUsuario", [], null,null, 20, 
 										   function(lista:Array)
 										   {
 										   		
 												lista.sortOn(["puntajeTotal"], Array.RETURNINDEXEDARRAY)
-												for(var i:int=0;i<10;i++){
+												for(var i:int=0;i<lista.length&&i<10;i++){
 													var objetoUsuario:DatabaseObject = lista[i] as DatabaseObject
+													trace(objetoUsuario.key)
 													if(objetoUsuario!= null){
 														TPosicion.appendText(i+1+"\n")
 														TNombre.appendText(objetoUsuario.key+"\n")
@@ -33,8 +34,15 @@
 													}
 													
 												}
-										   		TMisPuntos.appendText(usuario.PuntajeTotal)
-										   		TPuesto.appendText( String (lista.indexOf(usuario)))
+												
+												for(var j:int=0;j<lista.length;j++){
+													var objetoUsuario1:DatabaseObject = lista[j] as DatabaseObject
+													if(objetoUsuario1.key==usuario.key){
+														TMisPuntos.appendText(usuario.PuntajeTotal)
+										   				TPuesto.appendText( String(j+1))
+													}
+												}
+										   		
 										   })
 			
 			
