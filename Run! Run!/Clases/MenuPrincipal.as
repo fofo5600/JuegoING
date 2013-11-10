@@ -23,7 +23,7 @@
 			// constructor code
 			this.usuario= usuario;
 			Usuario.text = usuario.key;
-			Puntaje.text = usuario.PuntajeTotal;
+			Puntaje.text = usuario.puntajeTotal;
 			Bnivel1.addEventListener( MouseEvent.CLICK, seleccionNivel1);
 			if(usuario.nivelActual>=2){
 				Bnivel2.addEventListener( MouseEvent.CLICK, seleccionNivel2);

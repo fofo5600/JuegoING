@@ -29,12 +29,12 @@
 												}
 											}
 										})
-			Control.cliente.bigDB.loadRange("RetosEnviados", "enviados",[],usuarioJuego.key+"-notunique",null,100, function(lista:Array){
+			Control.cliente.bigDB.loadRange("RetosEnviados", "enviados",[],null,null,100, function(lista:Array){
 											trace(lista.length)
 											for(var i:int=0;i<lista.length;i++){
 												var objetoUsuario:DatabaseObject = lista[i] as DatabaseObject
-												trace(objetoUsuario.key+" "+objetoUsuario.miPuntaje)
-												if(objetoUsuario!= null){
+												trace(objetoUsuario.key+" "+objetoUsuario.retado)
+												if(objetoUsuario.retado==usuarioJuego.key){
 													var nuevaInfo: InformacionReto = new InformacionReto(objetoUsuario.key,objetoUsuario.nivel,objetoUsuario.retado, objetoUsuario.puntajeRetado, objetoUsuario.miPuntaje, objetoUsuario.resultado )
 													nuevaInfo.x=-62.65
 													nuevaInfo.y=100.95+(23*i)

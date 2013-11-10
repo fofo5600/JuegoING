@@ -248,7 +248,7 @@
 														usuario.retos+=1
 														
 														usuario.save(false,false,null,null)
-														Control.cliente.bigDB.createObject("RetosRecibidos", MenuCarga.usuarioRetado+usuario.retos , {nivel:1,retador:objetoJugardor.key,puntajeRetador:int(puntaje.score.text), miPuntaje:-1, resultado:false, usuario: MenuCarga.usuarioRetado },null,null)	
+														Control.cliente.bigDB.createObject("RetosEnviados", objetoJugardor.key+objetoJugardor.retos , {nivel:1,retado:MenuCarga.usuarioRetado,miPuntaje:int(puntaje.score.text), puntajeRetado:-1, resultado:false, usuario:objetoJugardor.key },null,null)	
 												   })	
 						
 					}
