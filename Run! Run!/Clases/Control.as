@@ -16,7 +16,7 @@
 	public class Control extends MovieClip
 	{
 
-		private var menuprincipal:MenuPrincipal;
+		private var menuPrincipal:MenuPrincipal;
 		private var nivel1:Nivel;
 		private var nivel2:Nivel2;
 		private var reto:MenuCarga;
@@ -224,12 +224,12 @@
 			addChild(pantallaReto)
 		}
 		private function cargarMenuPrincipal(){
-			menuprincipal = new MenuPrincipal(objectoJugador);
-			menuprincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
-			menuprincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
-			menuprincipal.addEventListener(EventoBoton.PUNTAJE, mostrarPuntaje);
-			menuprincipal.addEventListener(EventoBoton.RETOS, pantallaRetos);
-			addChild(menuprincipal);
+			menuPrincipal = new MenuPrincipal(objectoJugador);
+			menuPrincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
+			menuPrincipal.addEventListener(EventoBoton.NIVEL2, SeleccionNivel2);
+			menuPrincipal.addEventListener(EventoBoton.PUNTAJE, mostrarPuntaje);
+			menuPrincipal.addEventListener(EventoBoton.RETOS, pantallaRetos);
+			addChild(menuPrincipal);
 		}
 	}
 

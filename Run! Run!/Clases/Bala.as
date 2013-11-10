@@ -12,7 +12,7 @@
 	 */
 	public class Bala extends Objeto {
 		
-		private var v:int;
+		private var velocidad:int;
 
 		/*
 		 * Funcion constructor bala 
@@ -22,7 +22,7 @@
 		 */
 		public function Bala(inicialx: int, inicialy:int) {
 			x=inicialx;
-			v=inicialy;
+			velocidad=inicialy;
 		}
 
 		/*
@@ -36,7 +36,7 @@
 		 */
 		override public function movimiento(): void
 		{	
-			y = 0.00092 * Math.pow(((x += 20) - 350),2) + v;
+			y = 0.00092 * Math.pow(((x += 20) - 350),2) + velocidad;
 			
 		}
 	}

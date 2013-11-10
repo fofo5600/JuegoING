@@ -243,7 +243,6 @@
 						objetoJugardor.nivelActual=2
 					}
 					if(retando){
-						trace("entrooooooooo")
 						Control.cliente.bigDB.load("PlayerObjects", MenuCarga.usuarioRetado,function(usuario:DatabaseObject){
 														trace(usuario.retos)
 														usuario.retos+=1
