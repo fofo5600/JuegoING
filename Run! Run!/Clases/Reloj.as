@@ -3,6 +3,8 @@
 	import flash.utils.Timer;
 	import flash.text.TextField;
 	import flash.events.TimerEvent;
+	import flashx.textLayout.elements.OverflowPolicy;
+
 	/*
 	 * Clase Reloj
 	 * Creado por: Rodolfo Verjel
@@ -30,6 +32,15 @@
 			super.Actualizar();
 			reloj.text = String(segundo);
 		}
+		override public function pausar():void
+		{
+			super.pausar()
+		}
+		override public function continuar():void
+		{
+			super.continuar()
+		}
+		
 	}
 	
 }

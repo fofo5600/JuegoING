@@ -18,8 +18,8 @@
 
 		private var cerdito: Cerdito;
 		private var reloj: Timer;
-		private var manzana: Manzana;
-		private var manzanas: Array;
+		private var llave: Llave;
+		private var llaves: Array;
 		private var fin: GameOver;
 		private var bala : Bala;
 		private var balas: Array;
@@ -114,7 +114,7 @@
 				tiempo.Actualizar();
 			}
 			
-			if(Math.random() < 0.11 && manzanas.length<2)
+			if(Math.random() < 0.11 && llaves.length<3)
 			{
 				var ran: Number = (Math.random()* 150)+10;
 				var nM: Manzana = new Manzana(-15,ran);
@@ -198,20 +198,78 @@
 			
 			removeChild(cerdito)
 			
-			if(int(puntaje.score.text) > 100 && vidas>0){
-				objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
-				if(objetoJugardor.nivel2 < int(puntaje.score.text) ){
-					objetoJugardor.nivel2 = int(puntaje.score.text) 
-				}
-				objetoJugardor.save(false,false,null,null)
-				dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
-			}else{
-				termino = new GameOver();
-				addChild(termino);
-				esperar = new Timer(3000)
-				esperar.addEventListener(TimerEvent.TIMER, salir)
-				esperar.start()
+			if(jugandoReto){
+				Control.cliente.bigDB.load("Reto",Control.retador,function(usuario:DatabaseObject){
+													trace("entro aqui i i "+usuario.puntajeRetado)
+													usuario.puntajeRetado=int(puntaje.score.text)
+													objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
+													objetoJugardor.save(false,false,null,null)
+													usuario.puntajeRetado=int(puntaje.score.text)
+													usuario.save(false,false,null,null)
+													if(int(puntaje.score.text)>usuario.miPuntaje){
+														objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
+														objetoJugardor.save(false,false,null,null)
+														
+														ganador= new Ganador()
+														ganador.GPuntos.text=puntaje.score.text
+														addChild(ganador)
+														esperar = new Timer(3000)
+														esperar.addEventListener(TimerEvent.TIMER, salir)
+														esperar.start()
+													}else if(int(puntaje.score.text)<usuario.miPuntaje){
+														
+														Control.cliente.bigDB.load("PlayerObjects",usuario.usuario,function(usuarioGanador:DatabaseObject){
+																				   		usuarioGanador.PuntajeTotal+=usuario.miPuntaje
+																						usuarioGanador.save(false,false,null,null)
+																				   })
+														termino = new GameOver();
+														addChild(termino);
+														esperar = new Timer(3000)
+														esperar.addEventListener(TimerEvent.TIMER, salir)
+														esperar.start()
+													}
+												},null)
+			}
+			if(!jugandoReto){
 				
+				if(int(puntaje.score.text) > 100){
+					gano=true
+					objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
+					if(objetoJugardor.nivel1 < int(puntaje.score.text) ){
+						objetoJugardor.nivel1 = int(puntaje.score.text) 
+						
+						}
+						if(objetoJugardor.nivelActual==1){
+							objetoJugardor.nivelActual=2
+						}
+						if(retando){
+							Control.cliente.bigDB.load("PlayerObjects", MenuCarga.usuarioRetado,function(usuario:DatabaseObject){
+														trace(usuario.retos)
+														usuario.retos+=1
+														
+														usuario.save(false,false,null,null)
+														
+														Control.cliente.bigDB.createObject("Reto", objetoJugardor.key+objetoJugardor.retos , {nivel:1,retado:MenuCarga.usuarioRetado,miPuntaje:int(puntaje.score.text), puntajeRetado:-1, resultado:false, usuario:objetoJugardor.key },null,null)	
+												   })	
+							objetoJugardor.retosEnviados+=1
+					}
+					
+					objetoJugardor.save(false,false,null,null)
+					ganador= new Ganador()
+					ganador.GPuntos.text=puntaje.score.text
+					addChild(ganador)
+					esperar = new Timer(3000)
+					esperar.addEventListener(TimerEvent.TIMER, salir)
+					esperar.start()
+					
+				}else{
+					termino = new GameOver();
+					addChild(termino);
+					esperar = new Timer(3000)
+					esperar.addEventListener(TimerEvent.TIMER, salir)
+					esperar.start()
+					
+				}
 			}
 		}
 		/*
@@ -221,8 +279,13 @@
 		 */
 		override public function salir(tiempo : TimerEvent){
 			esperar.stop()
-			removeChild(termino)
-			dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+			if(gano){
+				removeChild(ganador)
+				dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
+			}else{
+				removeChild(termino)
+				dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE))
+			}
 		}
 		/*
 		 * Funcion Salir 

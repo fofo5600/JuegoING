@@ -30,11 +30,16 @@
 		private var vida2: Vida;
 		private var vida3: Vida;
 		private var termino : GameOver;
+		private var ganador : Ganador;
 		private var esperar : Timer
 		private var objetoJugardor : DatabaseObject
 		private var retando: Boolean
 		private var jugandoReto: Boolean
 		private var historia:Historia
+		private var gano:Boolean
+		private var enPausa:Boolean
+		private var pantallaPausa:Pausa
+		private var _collisionTest:CollisionTest;
 		/*
 		 * Funcion Nivel 
 		 * 			Constructor del Nivel lo instancia al entrar al primer nivel
@@ -43,7 +48,7 @@
 		public function Nivel1( objeto : DatabaseObject, jugandoReto:Boolean) {
 			
 			super(objeto)
-			
+			_collisionTest = new CollisionTest();
 			this.jugandoReto=jugandoReto
 			objetoJugardor = objeto
 			if(MenuCarga.usuarioRetado!=""){
@@ -53,7 +58,11 @@
 			}
 			addEventListener( Event.ADDED_TO_STAGE, moverse);
 			manzanaPuntaje.gotoAndStop(1)
-			tiempo.stop()
+			
+			tiempo.pausar()
+			gano=true
+			
+			pantallaPausa= new Pausa()
 			
 			historia = new Historia()
 			historia.gotoAndStop(1)
@@ -74,17 +83,23 @@
 												//historia.removeChildren(0,historia.numChildren)
 												removeChild(historia)
 												
+												tiempo.continuar()
+												enPausa=false
 												vidas=3;
 												vida1= new Vida();
 												vida2= new Vida();
 												vida3= new Vida();
 												
 												vida1.x= 680;
-												vida1.y= 15;
+												vida1.y= 25;
 												vida2.x= 720;
-												vida2.y= 15;
+												vida2.y= 25;
 												vida3.x= 760;
-												vida3.y= 15;
+												vida3.y= 25;
+												
+												vida1.gotoAndStop(1)
+												vida2.gotoAndStop(1)
+												vida3.gotoAndStop(1)
 												
 												addChild(vida1);
 												addChild(vida2);
@@ -124,7 +139,22 @@
 		 */
 		override public function KeyDown( e: KeyboardEvent) : void
       	{
-			cerdito.tecla(e);
+			if(e.keyCode == Keyboard.P){
+				if(enPausa){
+					trace("entro")
+					tiempo.continuar()
+					reloj.start()
+					enPausa=false
+					removeChild(pantallaPausa)
+				}else{
+					tiempo.pausar()
+					reloj.stop()
+					enPausa=true
+					addChild(pantallaPausa)
+				}
+			}else if(!enPausa){
+				cerdito.tecla(e);
+			}
 		}
 		/*
 		 * Funcion KeyUp 
@@ -175,7 +205,7 @@
 				var M: Manzana = manzanas[indiceManzanas];
 				M.movimiento();
 				
-				if (cerdito.hitTestObject(M)){
+				if ( _collisionTest.complex(cerdito,M)){
 					manzanaPuntaje.gotoAndStop(2);
 					puntaje.Aumentar(5);
 					removeChild(M);
@@ -206,7 +236,7 @@
 			removeChild(cerdito)
 			
 			if(jugandoReto){
-				Control.cliente.bigDB.load("RetosEnviados",Control.retador,function(usuario:DatabaseObject){
+				Control.cliente.bigDB.load("Reto",Control.retador,function(usuario:DatabaseObject){
 													trace("entro aqui i i "+usuario.puntajeRetado)
 													usuario.puntajeRetado=int(puntaje.score.text)
 													objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
@@ -217,6 +247,12 @@
 														objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
 														objetoJugardor.save(false,false,null,null)
 														
+														ganador= new Ganador()
+														ganador.GPuntos.text=puntaje.score.text
+														addChild(ganador)
+														esperar = new Timer(3000)
+														esperar.addEventListener(TimerEvent.TIMER, salir)
+														esperar.start()
 													}else if(int(puntaje.score.text)<usuario.miPuntaje){
 														
 														Control.cliente.bigDB.load("PlayerObjects",usuario.usuario,function(usuarioGanador:DatabaseObject){
@@ -231,30 +267,38 @@
 													}
 												},null)
 			}
-			if(retando){
+			if(!jugandoReto){
 				
 				if(int(puntaje.score.text) > 100){
+					gano=true
 					objetoJugardor.PuntajeTotal+=int(puntaje.score.text)
 					if(objetoJugardor.nivel1 < int(puntaje.score.text) ){
 						objetoJugardor.nivel1 = int(puntaje.score.text) 
 						
-					}
-					if(objetoJugardor.nivelActual==1){
-						objetoJugardor.nivelActual=2
-					}
-					if(retando){
-						Control.cliente.bigDB.load("PlayerObjects", MenuCarga.usuarioRetado,function(usuario:DatabaseObject){
+						}
+						if(objetoJugardor.nivelActual==1){
+							objetoJugardor.nivelActual=2
+						}
+						if(retando){
+							Control.cliente.bigDB.load("PlayerObjects", MenuCarga.usuarioRetado,function(usuario:DatabaseObject){
 														trace(usuario.retos)
 														usuario.retos+=1
 														
 														usuario.save(false,false,null,null)
-														Control.cliente.bigDB.createObject("RetosEnviados", objetoJugardor.key+objetoJugardor.retos , {nivel:1,retado:MenuCarga.usuarioRetado,miPuntaje:int(puntaje.score.text), puntajeRetado:-1, resultado:false, usuario:objetoJugardor.key },null,null)	
+														
+														Control.cliente.bigDB.createObject("Reto", objetoJugardor.key+objetoJugardor.retos , {nivel:1,retado:MenuCarga.usuarioRetado,miPuntaje:int(puntaje.score.text), puntajeRetado:-1, resultado:false, usuario:objetoJugardor.key },null,null)	
 												   })	
-						
+							objetoJugardor.retosEnviados+=1
 					}
-					objetoJugardor.retosEnviados+=1
+					
 					objetoJugardor.save(false,false,null,null)
-					dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
+					ganador= new Ganador()
+					ganador.GPuntos.text=puntaje.score.text
+					addChild(ganador)
+					esperar = new Timer(3000)
+					esperar.addEventListener(TimerEvent.TIMER, salir)
+					esperar.start()
+					
 				}else{
 					termino = new GameOver();
 					addChild(termino);
@@ -272,8 +316,14 @@
 		 */
 		override public function salir(tiempo : TimerEvent){
 			esperar.stop()
-			removeChild(termino)
-			dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE));
+			if(gano){
+				removeChild(ganador)
+				dispatchEvent( new EventosCerdito( EventosCerdito.GANO));
+			}else{
+				removeChild(termino)
+				dispatchEvent( new EventosCerdito( EventosCerdito.MUERTE))
+			}
+			
 			
 		}
 	}

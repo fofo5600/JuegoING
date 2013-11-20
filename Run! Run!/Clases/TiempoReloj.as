@@ -45,6 +45,12 @@
 			segundo=0;
 			Actualizar();
 		}
+		public function pausar():void{
+			contador.stop()
+		}
+		public function continuar():void{
+			contador.start()
+		}
 		/*
 		 * Funcion  Actualizar
 		 *		Actualiza el contador cada vez que cambie el valor

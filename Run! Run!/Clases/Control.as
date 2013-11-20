@@ -108,18 +108,22 @@
 	
 			if(login.NombreUs.text != "")
 			{
+				
 				PlayerIO.quickConnect.simpleConnect(
 					stage, 					
 					"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q", login.NombreUs.text,	login.Contrasena.text,					
 					function (){
-						//trace("-------------------------------------")
+						trace(login.NombreUs.text+" "+ login.Contrasena.text )
+						//
 						PlayerIO.connect(
 						stage,"run-run-piggy-run-nhqdamv1fkg5kgcfjey7q","public",login.NombreUs.text,"",
 						null,function (clienteNuevo:Client){
 									cliente= clienteNuevo
 									cliente.bigDB.loadMyPlayerObject(function(objecto:DatabaseObject){
+																	 
 										objectoJugador = objecto; 
 										cargarMenuPrincipal()
+										trace("-------------------------------------")
 										removeChild(login);
 																	 
 									});
@@ -163,7 +167,7 @@
 					null,null,null,null,null,
 					function(client:Client):void{
 						//trace("aqui")
-						client.bigDB.createObject("PlayerObjects", usuarioNuevo, {PuntajeTotal:0, nivel1:0,nivel2:0, nivelActual:1, retos:0, retosEnviados:0 },null);
+						client.bigDB.createObject("PlayerObjects", usuarioNuevo, {puntajeTotal:0, nivel1:0,nivel2:0, nivelActual:1, retos:0, retosEnviados:0 },null);
 						registro.BRNombre.text="";
 						registro.BRContrasena.text="";
 						registro.BRConfirmar.text="";
@@ -223,6 +227,7 @@
 									 		});
 			addChild(pantallaReto)
 		}
+		
 		private function cargarMenuPrincipal(){
 			menuPrincipal = new MenuPrincipal(objectoJugador);
 			menuPrincipal.addEventListener(EventoBoton.NIVEL1, SeleccionNivel1);
