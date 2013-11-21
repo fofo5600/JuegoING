@@ -26,7 +26,7 @@
 			CVolver.addEventListener( MouseEvent.CLICK, regresar);
 			var arrayTemporal:Array = new Array();
 			usuarioRetado=""
-			Control.cliente.bigDB.loadRange("PlayerObjects", "puntajeUsuario", [], null,null, 20, 
+			Control.cliente.bigDB.loadRange("PlayerObjects", "Usuario", [], null,null, 20, 
 										   function(lista:Array)
 										   {
 											  

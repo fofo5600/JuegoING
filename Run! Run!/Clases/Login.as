@@ -19,6 +19,7 @@
 			// constructor code
 			Bingresar.addEventListener( MouseEvent.CLICK, iniciarSesion);
 			BRegistar.addEventListener( MouseEvent.CLICK, registro);
+			e.addEventListener( MouseEvent.CLICK, r);
 		}
 		/*
 		 * Funcion iniciarSesion 
@@ -37,6 +38,10 @@
 		 */
 		public function registro( evento : MouseEvent): void{
 			dispatchEvent(new EventoBoton(EventoBoton.REGISTRO));
+		}
+		
+		public function r( evento : MouseEvent): void{
+			dispatchEvent(new EventoBoton(EventoBoton.INICIO));
 		}
 	}
 	

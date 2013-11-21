@@ -28,8 +28,16 @@
 		private var vida2: Vida;
 		private var vida3: Vida;
 		private var termino : GameOver;
+		private var ganador : Ganador;
 		private var esperar : Timer
 		private var objetoJugardor : DatabaseObject
+		private var retando: Boolean
+		private var jugandoReto: Boolean
+		private var historia:Historia
+		private var gano:Boolean
+		private var enPausa:Boolean
+		private var pantallaPausa:Pausa
+		private var _collisionTest:CollisionTest;
 		/*
 		 * Funcion Nivel2 
 		 * 			Constructor del Nivel lo instancia al entrar al segundo nivel
@@ -38,35 +46,78 @@
 		public function Nivel2(objeto : DatabaseObject) {
 			
 			super(objeto)
-			
-			vidas=3;
-			vida1= new Vida();
-			vida2= new Vida();
-			vida3= new Vida();
-			
-			vida1.x= 680;
-			vida1.y= 15;
-			vida2.x= 720;
-			vida2.y= 15;
-			vida3.x= 760;
-			vida3.y= 15;
-			
-			addChild(vida1);
-			addChild(vida2);
-			addChild(vida3);
-			
-			cerdito= new Cerdito();
-			cerdito.x=400;
-			cerdito.y=500;
-			addChild(cerdito);
-			
-			manzanas= new Array();
-			balas = new Array();
+			_collisionTest = new CollisionTest();
+			this.jugandoReto=jugandoReto
+			objetoJugardor = objeto
+			if(MenuCarga.usuarioRetado!=""){
+				retando=true
+			}else{
+				retando=false
+			}
 			addEventListener( Event.ADDED_TO_STAGE, moverse);
+			manzanaPuntaje.gotoAndStop(1)
 			
-			reloj= new Timer(50);
-			reloj.addEventListener(TimerEvent.TIMER, Tick);
-			reloj.start();
+			tiempo.pausar()
+			gano=true
+			
+			pantallaPausa= new Pausa()
+			
+			/*historia = new Historia()
+			historia.gotoAndStop(1)
+			historia.addEventListener(EventoBoton.SIG,function(evento:EventoBoton){
+									  		historia.nextFrame()
+											trace(historia.currentFrame)
+											if(historia.currentFrame==6){
+												var espera:Timer = new Timer(3000);
+												espera.addEventListener(TimerEvent.TIMER, function(evento:TimerEvent){
+																			historia.gotoAndStop(7)
+																			espera.stop()
+																			
+																		})
+												espera.start();
+											}
+									  })
+			historia.addEventListener(EventoBoton.INICIO,function(evento:EventoBoton){	
+												//historia.removeChildren(0,historia.numChildren)
+												removeChild(historia)*/
+												
+												tiempo.continuar()
+												enPausa=false
+												vidas=3;
+												vida1= new Vida();
+												vida2= new Vida();
+												vida3= new Vida();
+												
+												vida1.x= 680;
+												vida1.y= 25;
+												vida2.x= 720;
+												vida2.y= 25;
+												vida3.x= 760;
+												vida3.y= 25;
+												
+												vida1.gotoAndStop(1)
+												vida2.gotoAndStop(1)
+												vida3.gotoAndStop(1)
+												
+												addChild(vida1);
+												addChild(vida2);
+												addChild(vida3);
+												
+												cerdito= new Cerdito();
+												cerdito.x=400;
+												cerdito.y=500;
+												addChild(cerdito);
+												
+												llaves= new Array();												
+												balas = new Array()
+												
+												reloj= new Timer(80);
+												reloj.addEventListener(TimerEvent.TIMER, Tick);
+												reloj.start();
+			
+											//})
+			
+			//addChild(historia)
 			
 		}
 		/*
@@ -117,16 +168,17 @@
 			if(Math.random() < 0.11 && llaves.length<3)
 			{
 				var ran: Number = (Math.random()* 150)+10;
-				var nM: Manzana = new Manzana(-15,ran);
-				manzanas.push(nM);
+				var nL: Llave = new Llave(-15,ran);
+				llaves.push(nL);
 				
-				addChild(nM);
-				if(nM.x>805 || nM.y>605){
-					removeChild(nM);
+				addChild(nL);
+				if(nL.x>805 || nL.y>605){
+					removeChild(nL);
 				}
 				
 			}
-			if(Math.random() < 0.03 )
+			
+			if(Math.random() < 0.03 && balas.length<1 )
 			{
 				var ran1: Number =  Math.random()*150; 
 				var nB: Bala = new Bala(-15,ran1);
@@ -137,28 +189,26 @@
 			}
 			
 			
-			var indiceManzanas : int= manzanas.length-1;
+			var indiceLlaves : int= llaves.length-1;
 			var indiceBalas : int=balas.length-1;
 			
-			
-			while(indiceManzanas>-1){
-				var M: Manzana = manzanas[indiceManzanas];
-				M.movimiento();
+			while(indiceLlaves>-1){
+				var L: Llave  = llaves[indiceLlaves];
+				L.movimiento();
 				
-				if (cerdito.hitTestObject(M)){
+				if (cerdito.hitTestObject(L)){
 					manzanaPuntaje.gotoAndStop(2);
 					puntaje.Aumentar(5);
-					removeChild(M);
-					manzanas.splice(indiceManzanas,1);
+					removeChild(L);
+					llaves.splice(indiceLlaves,1);
 				}
-				if(M.x>825 || M.y > 625){
-					removeChild(M);
-					manzanas.splice(indiceManzanas,1);
+				if(L.x>825 || L.y > 625){
+					removeChild(L);
+					llaves.splice(indiceLlaves,1);
 					puntaje.reducir(2);
 				}
-				indiceManzanas=indiceManzanas-1;
+				indiceLlaves=indiceLlaves-1;
 			}
-			
 			
 			
 			while(indiceBalas>-1){
@@ -168,6 +218,7 @@
 				if (cerdito.hitTestObject(B)){
 					restarVida()
 					if(vidas==0){
+						puntaje.score.text="0"
 						terminarJuego()
 					}
 					
@@ -180,7 +231,6 @@
 				}
 				indiceBalas=indiceBalas-1;
 			}
-			
 		}
 		/*
 		 * Funcion terminarJuego 
@@ -191,9 +241,9 @@
 		 */
 		override public function terminarJuego(){
 			reloj.stop();
-			for each ( var M: Manzana in manzanas)
+			for each ( var L: Llave in llaves)
 			{
-				removeChild(M);
+				removeChild(L);
 			}
 			
 			removeChild(cerdito)
@@ -295,11 +345,11 @@
 		 */
 		private function restarVida(){
 			if(vidas==3){
-				removeChild(vida3)
+				vida3.gotoAndStop(2)
 			}else if(vidas==2){
-				removeChild(vida2)
+				vida2.gotoAndStop(2)
 			}else{
-				removeChild(vida1)
+				vida1.gotoAndStop(2)
 			}
 			vidas-=1
 			

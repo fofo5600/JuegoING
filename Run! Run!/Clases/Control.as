@@ -29,6 +29,7 @@
 		private var pantallaReto:PantallaRetos
 		private var jugandoReto:Boolean
 		public static var retador:String
+		private var tienda: ControladorTienda
 		
 		public function Control()
 		{
@@ -40,6 +41,11 @@
 			
 			login.addEventListener(EventoBoton.INICIAR, inicioSesion);
 			login.addEventListener(EventoBoton.REGISTRO, registrar);
+			login.addEventListener(EventoBoton.INICIO, function(ev:EventoBoton){
+								   		tienda = new ControladorTienda()
+										removeChild(login)
+										addChild(tienda)
+								   })
 			
 
 		}
